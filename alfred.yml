@@ -1,4 +1,4 @@
-deploy:
+deploy*:
     summary: Deploy
     tasks: git docker
 
@@ -8,11 +8,9 @@ git:
         git add .
         git commit
         git push origin master
-    private: true
 
 docker:
     summary: Deploy to dockerhub.com
     command: >
         docker build -t kcmerrill/go-dist . &&
         docker push kcmerrill/go-dist
-    private: true

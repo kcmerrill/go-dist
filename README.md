@@ -7,6 +7,13 @@ Go binary distribution made easy
 ## Installation via Docker
 `docker run -d -P --name go-dist kcmerrill/go-dist`
 
+## Binaries
+![Mac OSX](https://raw.githubusercontent.com/kcmerrill/go-dist/master/assets/apple_logo.png "Mac OSX") [386](http://go-dist.kcmerrill.com/kcmerrill/go-dist/mac/386) | [amd64](http://go-dist.kcmerrill.com/kcmerrill/go-dist/mac/amd64)
+
+![Windows](https://raw.githubusercontent.com/kcmerrill/go-dist/master/assets/windows_logo.png "Windows") [386](http://go-dist.kcmerrill.com/kcmerrill/go-dist/windows/386) | [amd64](http://go-dist.kcmerrill.com/kcmerrill/go-dist/windows/amd64)
+
+![Linux](https://raw.githubusercontent.com/kcmerrill/go-dist/master/assets/linux_logo.png "Linux") [386](http://go-dist.kcmerrill.com/kcmerrill/go-dist/linux/386) | [amd64](http://go-dist.kcmerrill.com/kcmerrill/go-dist/linux/amd64)
+
 ## Demo
 The binary section is this project in action!
 

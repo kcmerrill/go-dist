@@ -4,6 +4,9 @@ Go binary distribution made easy
 ## Installation
 `go get -u github.com/go-dist`
 
+## What is it
+I got tired of making "releases" in github, especially for my tiny projects. go-dist will build any github repo's binaries via a website and allow you to download the binaries without you needing to build them yourself. Simply link to the binaries and go-dist will rebuild the binary for you and serve them up to your users. 
+
 ## Installation via Docker
 `docker run -d -P --name go-dist kcmerrill/go-dist`
 

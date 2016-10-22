@@ -101,10 +101,10 @@ func main() {
 	/* TODO: Get a proper regex for project */
 
 	/* Grab text for use in your README.md */
-	r.HandleFunc("/{username:[a-zA-Z]*}/{project}", FetchReadMe)
+	r.HandleFunc("/{username:[A-Za-z0-9\\-\\_]+}/{project:[A-Za-z0-9\\-\\_]+}", FetchReadMe)
 
 	// Routes consist of a path and a handler function.
-	r.HandleFunc("/{username:[a-zA-Z]*}/{project}/{os:mac|windows|linux}/{arch:amd64|arm|386}", FetchBinary)
+	r.HandleFunc("/{username:[A-Za-z0-9\\-\\_]+}/{project:[A-Za-z0-9\\-\\_]+}/{os:mac|windows|linux}/{arch:amd64|arm|386}", FetchBinary)
 
 	// Bind to a port and pass our router in
 	log.Fatal(http.ListenAndServe(":80", r))

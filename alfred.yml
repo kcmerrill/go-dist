@@ -1,0 +1,18 @@
+deploy:
+    summary: Deploy
+    tasks: git docker
+
+git:
+    summary: Push to github
+    command: |
+        git add .
+        git commit
+        git push origin master
+    private: true
+
+docker:
+    summary: Deploy to dockerhub.com
+    command: >
+        docker build -t kcmerrill/go-dist . &&
+        docker push kcmerrill/go-dist
+    private: true

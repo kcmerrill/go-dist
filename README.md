@@ -4,6 +4,9 @@ Go binary distribution made easy
 ## Installation
 `go get -u github.com/go-dist`
 
+## What is it
+I got tired of making "releases" in github, especially for my tiny projects. go-dist will build any github repo's binaries via a website and allow you to download the binaries without you needing to build them yourself. Simply link to the binaries and go-dist will rebuild the binary for you and serve them up to your users. 
+
 ## Installation via Docker
 `docker run -d -P --name go-dist kcmerrill/go-dist`
 
@@ -32,7 +35,7 @@ Until some of the features outlined below in my todo list, there are of course s
 Also, there are quite a few of [known limitations](https://github.com/golang/go/issues/6376) when it comes to cross compiling. If you are noticing issues with your binaries, chances are likely there are open/stale github issues in the golang issue tracker.
 
 ## How
-Every half hour, or if a binary/project doesn't exist, `go get -u <project>`. Then, using the great work over at [mitchellh/gox](https://github.com/mitchellh/gox), generate the binary on the fly.
+When a user clicks on the link, if it's been over a half hour since the project was built, or if a binary/project doesn't exist, `go get -u <project>`. Then, using the great work over at [mitchellh/gox](https://github.com/mitchellh/gox), generate the binary on the fly. Until webhooks are integreated, the first person to get a non-cached version it will be a bit slower for. 
 
 ## TODO
 * Add webhook capabilities when merged into master, invalidate cache and automagically build everything(preferred)

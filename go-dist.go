@@ -98,11 +98,13 @@ func FetchBinary(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := mux.NewRouter()
 
+	/* TODO: Get a proper regex for project */
+
 	/* Grab text for use in your README.md */
-	r.HandleFunc("/{username:[a-zA-Z]*}/{project:[a-zA-Z]*}", FetchReadMe)
+	r.HandleFunc("/{username:[a-zA-Z]*}/{project}", FetchReadMe)
 
 	// Routes consist of a path and a handler function.
-	r.HandleFunc("/{username:[a-zA-Z]*}/{project:[a-zA-Z]*}/{os:mac|windows|linux}/{arch:amd64|arm|386}", FetchBinary)
+	r.HandleFunc("/{username:[a-zA-Z]*}/{project}/{os:mac|windows|linux}/{arch:amd64|arm|386}", FetchBinary)
 
 	// Bind to a port and pass our router in
 	log.Fatal(http.ListenAndServe(":80", r))

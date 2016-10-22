@@ -64,8 +64,7 @@ func FetchBinary(w http.ResponseWriter, r *http.Request) {
 		if dir_err := os.MkdirAll(directoryName, 0755); dir_err == nil {
 			_, project_err := exec.Command("bash", "-c", "go get -u "+project).Output()
 			if project_err == nil {
-				_, build_err := exec.Command("bash", "-c", "gox --os="+vars["os"]+" --arch="+vars["arch"]+" --output="+actualFileName+" "+project).Output()
-				fmt.Println("bash:", "bash", "-c", "gox --os="+vars["os"]+" --arch="+vars["arch"]+" --output="+strings.Replace(actualFileName, ".exe", "", 0)+" "+project)
+				_, build_err := exec.Command("bash", "-c", "gox --os="+vars["os"]+" --arch="+vars["arch"]+" --output="+strings.Replace(actualFileName, ".exe", "", -1)+" "+project).Output()
 				if build_err != nil {
 					w.WriteHeader(http.StatusInternalServerError)
 					w.Write([]byte("error"))

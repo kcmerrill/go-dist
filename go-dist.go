@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
 	"io/ioutil"
@@ -13,7 +14,25 @@ import (
 	"time"
 )
 
-func FetchReadMe(w http.ResponseWriter, r *http.Request) {
+var port string
+var cache string
+var username string
+
+func ProjectHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		GitHubWebHookHandler(w, r)
+	} else {
+		FetchReadMeHandler(w, r)
+	}
+}
+
+func GitHubWebHookHandler(w http.ResponseWriter, r *http.Request) {
+	body, _ := ioutil.ReadAll(r.Body)
+	fmt.Println(string(body))
+	defer r.Body.Close()
+}
+
+func FetchReadMeHandler(w http.ResponseWriter, r *http.Request) {
 	/* extract our vars out */
 	vars := mux.Vars(r)
 
@@ -35,7 +54,7 @@ func FetchReadMe(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(readme))
 }
 
-func FetchBinary(w http.ResponseWriter, r *http.Request) {
+func FetchBinaryHandler(w http.ResponseWriter, r *http.Request) {
 	/* extract our vars out */
 	vars := mux.Vars(r)
 
@@ -60,7 +79,12 @@ func FetchBinary(w http.ResponseWriter, r *http.Request) {
 	/* does the folder exist? */
 	info, err := os.Stat(actualFileName)
 
-	if err != nil || (err == nil && time.Now().After(info.ModTime().Add(time.Hour*1))) {
+	dur, dur_err := time.ParseDuration(cache)
+	if dur_err != nil {
+		dur, _ = time.ParseDuration("60m")
+	}
+
+	if err != nil || (err == nil && time.Now().After(info.ModTime().Add(dur))) {
 		if dir_err := os.MkdirAll(directoryName, 0755); dir_err == nil {
 			_, project_err := exec.Command("bash", "-c", "go get -u "+project).Output()
 			if project_err == nil {
@@ -95,16 +119,18 @@ func FetchBinary(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	port = *flag.String("port", "8080", "Port")
+	cache = *flag.String("cache", "60m", "Cache for how many minutes")
+	username = *flag.String("username", "[A-Za-z0-9\\-\\_]+", "")
+
 	r := mux.NewRouter()
 
-	/* TODO: Get a proper regex for project */
-
 	/* Grab text for use in your README.md */
-	r.HandleFunc("/{username:[A-Za-z0-9\\-\\_]+}/{project:[A-Za-z0-9\\-\\_]+}", FetchReadMe)
+	r.HandleFunc("/{username:"+username+"}/{project:[A-Za-z0-9\\-\\_]+}", ProjectHandler)
 
 	// Routes consist of a path and a handler function.
-	r.HandleFunc("/{username:[A-Za-z0-9\\-\\_]+}/{project:[A-Za-z0-9\\-\\_]+}/{os:mac|windows|linux}/{arch:amd64|arm|386}", FetchBinary)
+	r.HandleFunc("/{username:"+username+"}/{project:[A-Za-z0-9\\-\\_]+}/{os:mac|windows|linux}/{arch:amd64|arm|386}", FetchBinaryHandler)
 
 	// Bind to a port and pass our router in
-	log.Fatal(http.ListenAndServe(":80", r))
+	log.Fatal(http.ListenAndServe(":"+port, r))
 }

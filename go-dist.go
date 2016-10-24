@@ -119,7 +119,7 @@ func FetchBinaryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	port = *flag.String("port", "8080", "Port")
+	port = *flag.String("port", "80", "Port")
 	cache = *flag.String("cache", "60m", "Cache for how many minutes")
 	username = *flag.String("username", "[A-Za-z0-9\\-\\_]+", "")
 

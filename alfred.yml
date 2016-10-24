@@ -1,6 +1,6 @@
 deploy*:
     summary: Deploy
-    tasks: git docker
+    tasks: git docker up
 
 git:
     summary: Push to github
@@ -14,3 +14,9 @@ docker:
     command: >
         docker build -t kcmerrill/go-dist . &&
         docker push kcmerrill/go-dist
+
+up:
+    summary: Run go-dist container
+    docker: kill.remove go-dist
+    command: |
+        docker run -d -P --name go-dist kcmerrill/go-dist

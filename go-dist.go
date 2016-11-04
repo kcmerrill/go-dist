@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -26,10 +27,16 @@ func ProjectHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type GithubWebResponse struct {
+	Ref string `json:"ref"`
+}
+
 func GitHubWebHookHandler(w http.ResponseWriter, r *http.Request) {
+	wh := &GithubWebResponse{}
+	json.Unmarshal(wh, r)
 	body, _ := ioutil.ReadAll(r.Body)
-	fmt.Println(string(body))
 	defer r.Body.Close()
+	fmt.Println(wh.Ref)
 }
 
 func FetchReadMeHandler(w http.ResponseWriter, r *http.Request) {

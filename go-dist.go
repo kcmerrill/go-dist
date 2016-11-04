@@ -15,9 +15,7 @@ import (
 	"time"
 )
 
-var port string
-var cache string
-var username string
+var cache *string
 
 func ProjectHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
@@ -32,11 +30,26 @@ type GithubWebResponse struct {
 }
 
 func GitHubWebHookHandler(w http.ResponseWriter, r *http.Request) {
+	/* extract our vars out */
+	vars := mux.Vars(r)
+
 	wh := &GithubWebResponse{}
-	json.Unmarshal(wh, r)
 	body, _ := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
-	fmt.Println(wh.Ref)
+
+	err := json.Unmarshal(body, wh)
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	if strings.HasSuffix(wh.Ref, "/master") {
+		/* used for our project name */
+		project := "github.com/" + vars["username"] + "/" + vars["project"]
+		directoryName := "/tmp/" + project
+		os.RemoveAll(directoryName)
+		fmt.Println("Resetting: ", directoryName)
+	}
 }
 
 func FetchReadMeHandler(w http.ResponseWriter, r *http.Request) {
@@ -62,6 +75,7 @@ func FetchReadMeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func FetchBinaryHandler(w http.ResponseWriter, r *http.Request) {
+	cache := "90s"
 	/* extract our vars out */
 	vars := mux.Vars(r)
 
@@ -126,18 +140,21 @@ func FetchBinaryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	port = *flag.String("port", "80", "Port")
-	cache = *flag.String("cache", "60m", "Cache for how many minutes")
-	username = *flag.String("username", "[A-Za-z0-9\\-\\_]+", "")
+	port := flag.Int("port", 80, "Port")
+	username := flag.String("username", "[A-Za-z0-9\\-\\_]+", "")
+	cache = flag.String("cache", "60m", "Cache for how many minutes")
 
+	flag.Parse()
+
+	fmt.Println("go-dist")
 	r := mux.NewRouter()
 
 	/* Grab text for use in your README.md */
-	r.HandleFunc("/{username:"+username+"}/{project:[A-Za-z0-9\\-\\_]+}", ProjectHandler)
+	r.HandleFunc("/{username:"+*username+"}/{project:[A-Za-z0-9\\-\\_]+}", ProjectHandler)
 
 	// Routes consist of a path and a handler function.
-	r.HandleFunc("/{username:"+username+"}/{project:[A-Za-z0-9\\-\\_]+}/{os:mac|windows|linux}/{arch:amd64|arm|386}", FetchBinaryHandler)
+	r.HandleFunc("/{username:"+*username+"}/{project:[A-Za-z0-9\\-\\_]+}/{os:mac|windows|linux}/{arch:amd64|arm|386}", FetchBinaryHandler)
 
 	// Bind to a port and pass our router in
-	log.Fatal(http.ListenAndServe(":"+port, r))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), r))
 }

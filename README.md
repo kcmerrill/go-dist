@@ -8,7 +8,7 @@ Go binary distribution made easy
 I got tired of making "releases" in github, especially for my tiny projects. go-dist will build any github repo's binaries via a website and allow you to download the binaries without you needing to build them yourself. Simply link to the binaries and go-dist will rebuild the binary for you and serve them up to your users.
 
 ## Installation via Docker
-`docker run -d -P --name go-dist kcmerrill/go-dist`
+`docker run -d -P --restart=always --name go-dist kcmerrill/go-dist`
 
 ## Binaries
 ![Mac OSX](https://raw.githubusercontent.com/kcmerrill/go-dist/master/assets/apple_logo.png "Mac OSX") [386](http://go-dist.kcmerrill.com/kcmerrill/go-dist/mac/386) | [amd64](http://go-dist.kcmerrill.com/kcmerrill/go-dist/mac/amd64)

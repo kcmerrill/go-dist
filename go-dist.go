@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -13,6 +12,8 @@ import (
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 var cache *string
@@ -108,8 +109,10 @@ func FetchBinaryHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil || (err == nil && time.Now().After(info.ModTime().Add(dur))) {
 		if dir_err := os.MkdirAll(directoryName, 0755); dir_err == nil {
 			_, project_err := exec.Command("bash", "-c", "go get -u "+project).Output()
+			version, _ := exec.Command("bash", "-c", "cd /go/src/"+project+" && git rev-list --count HEAD").Output()
+			commits, _ := exec.Command("bash", "-c", "cd /go/src/"+project+" && git rev-parse HEAD").Output()
 			if project_err == nil {
-				_, build_err := exec.Command("bash", "-c", "gox --os="+vars["os"]+" --arch="+vars["arch"]+" --output="+strings.Replace(actualFileName, ".exe", "", -1)+" "+project).Output()
+				_, build_err := exec.Command("bash", "-c", "gox -ldflags \"-X main.Commit="+string(commits)+" -X main.Version=0.1."+string(version)+"\" --os="+vars["os"]+" --arch="+vars["arch"]+" --output="+strings.Replace(actualFileName, ".exe", "", -1)+" "+project).Output()
 				if build_err != nil {
 					w.WriteHeader(http.StatusInternalServerError)
 					w.Write([]byte("error"))
@@ -142,7 +145,7 @@ func FetchBinaryHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	port := flag.Int("port", 80, "Port")
 	username := flag.String("username", "[A-Za-z0-9\\-\\_]+", "")
-	cache = flag.String("cache", "60m", "Cache for how many minutes")
+	cache = flag.String("cache", "0s", "Cache for how many minutes")
 
 	flag.Parse()
 
